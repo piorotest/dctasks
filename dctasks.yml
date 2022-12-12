@@ -1,0 +1,15 @@
+- name: delete bookmark
+  action: delete_bookmark 
+  bookmark_name: book1
+
+- name: create bookmark
+  action: create_bookmark 
+  source: fixerdb
+  bookmark_name: book1
+
+- name: refresh from bookmark 
+  action: refresh_from_bookmark 
+  database: pipedb
+  bookmark_name: book1
+
+  
