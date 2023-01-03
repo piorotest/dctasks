@@ -1,15 +1,32 @@
 - name: delete bookmark
   action: delete_bookmark 
-  bookmark_name: book1
+  bookmark_name: book1-devdb
 
 - name: create bookmark
   action: create_bookmark 
-  source: fixerdb
-  bookmark_name: book1
+  source: devdb
+  bookmark_name: book1-devdb
 
 - name: refresh from bookmark 
   action: refresh_from_bookmark 
   database: pipedb
-  bookmark_name: book1
+  bookmark_name: book1-devdb
+
+- name: refresh from snapshot 
+  action: refresh_from_latest_snapshot 
+  database: pipedb
+
+
+- name: create a pipeline database
+  action: create_vdb_from_bookmark
+  database: pipedb
+  bookmark_name: book1-devdb
+  server: singlenode
+  oracle_home: /u01/app/oracle/product/19.0.0/dbhome_1
+
+
+- name: list bookmark
+  action: list_bookmark
+  database: devdb,pipedb
 
   
