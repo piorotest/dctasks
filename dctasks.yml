@@ -30,3 +30,12 @@
   database: devdb,pipedb
 
   
+- name: create pre-test bookmark
+  action: create_bookmark 
+  source: pipedb
+  bookmark_name: pipedb_runtest_pre
+
+- name: create post-test bookmark
+  action: create_bookmark 
+  source: pipedb
+  bookmark_name: pipedb_runtest_post

@@ -17,7 +17,7 @@ print(f"Connecting to DCT: {common.BASE_URL}")
 if pipeline_build:
     print(f"adding pipeline suffix to bookmarks: {pipeline_build}")
 
-with open('dctasks.yml') as f:
+with open('/code/dctasks.yml') as f:
    task_list = yaml.load(f, Loader=SafeLoader)
 
 task = [ x for x in task_list if x["name"] == task_name ]
