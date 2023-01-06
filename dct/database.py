@@ -3,9 +3,10 @@ from dct import common
 
 def find_virtual_database(database_name:str, fqdn:str=None) -> str:
     if fqdn:
-        filter_exp = filter_exp + " AND fqdn EQ f'{fqdn}' "
+        filter_exp = f"name EQ '{database_name}' AND fqdn EQ f'{fqdn}' "
     else:
         filter_exp = f"name EQ '{database_name}'"
+
     filter_exp_obj = {
         "filter_expression": filter_exp
     }
@@ -119,6 +120,25 @@ def create_database(database_name:str, fqdn:str, repository:str, **kwargs):
 
     url = f"vdbs/provision_from_bookmark"
     res = common.DCT_POST(url, payload=create_obj)
+    if res:
+        common.wait_for_job(res["job"]["id"])      
+    else:
+        return 1
+
+
+    return 0
+
+def delete_database(database_name:str, fqdn:str):
+
+    delete_obj = {
+        "force": False
+    }
+
+    dbid = find_virtual_database(database_name)
+    print(f"DATABASE ID {dbid}")
+
+    url = f"vdbs/{dbid}/delete"
+    res = common.DCT_POST(url, payload=delete_obj)
     if res:
         common.wait_for_job(res["job"]["id"])      
     else:

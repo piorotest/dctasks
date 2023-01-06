@@ -24,6 +24,12 @@
   server: singlenode
   oracle_home: /u01/app/oracle/product/19.0.0/dbhome_1
 
+- name: delete database
+  action: drop_vdb
+  database: devdb
+  bookmark_name: book1-devdb
+  server: singlenode
+  oracle_home: /u01/app/oracle/product/19.0.0/dbhome_1
 
 - name: list bookmark
   action: list_bookmark
@@ -39,3 +45,11 @@
   action: create_bookmark 
   source: pipedb
   bookmark_name: pipedb_runtest_post
+
+
+- name: create a fixdb database
+  action: create_vdb_from_bookmark
+  database: f
+  bookmark_name: fixdb
+  server: singlenode
+  oracle_home: /u01/app/oracle/product/19.0.0/dbhome_1

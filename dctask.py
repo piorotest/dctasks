@@ -11,13 +11,14 @@ common.BASE_URL=os.getenv('URL')
 common.API_KEY=os.getenv('API_KEY')
 task_name=os.getenv('TASK_NAME')
 pipeline_build=os.getenv('PIPENAME')
-
+user_bookmark_name=os.getenv('BOOKMARK_NAME')
+user_database_name=os.getenv('DATABASE_NAME')
 
 print(f"Connecting to DCT: {common.BASE_URL}")
 if pipeline_build:
     print(f"adding pipeline suffix to bookmarks: {pipeline_build}")
 
-with open('/code/dctasks.yml') as f:
+with open('dctasks.yml') as f:
    task_list = yaml.load(f, Loader=SafeLoader)
 
 task = [ x for x in task_list if x["name"] == task_name ]
@@ -61,10 +62,13 @@ if task[0]["action"] == "list_bookmark":
 
 
 if task[0]["action"] == "refresh_from_bookmark":
-    if pipeline_build:
-        bookmark_name = task[0]["bookmark_name"] + f"_{pipeline_build}"
+    if user_bookmark_name:
+        bookmark_name = user_bookmark_name
     else:
-        bookmark_name = task[0]["bookmark_name"]
+        if pipeline_build:
+            bookmark_name = task[0]["bookmark_name"] + f"_{pipeline_build}"
+        else:
+            bookmark_name = task[0]["bookmark_name"]
     if database.refresh_vdb(task[0]["database"], bookmark_name = bookmark_name):
         print("Error with refreshing database from bookmark")
         sys.exit(-1)   
@@ -82,15 +86,47 @@ if task[0]["action"] == "refresh_from_latest_snapshot":
 
 
 if task[0]["action"] == "create_vdb_from_bookmark":
-    if pipeline_build:
-        bookmark_name = task[0]["bookmark_name"] + f"_{pipeline_build}"
+    if user_bookmark_name:
+        bookmark_name = user_bookmark_name
     else:
-        bookmark_name = task[0]["bookmark_name"]
-    if database.create_database(task[0]["database"], task[0]["server"], task[0]["oracle_home"], bookmark_name = bookmark_name):
-        print("Error with refreshing database from bookmark")
+        if pipeline_build:
+            bookmark_name = task[0]["bookmark_name"] + f"_{pipeline_build}"
+        else:
+            bookmark_name = task[0]["bookmark_name"]
+
+    if user_database_name:
+        database_name = user_database_name
+    else:
+        if pipeline_build:
+            database_name = task[0]["database"] + f"_{pipeline_build}"[5:]
+        else:
+            database_name = task[0]["database"]
+
+    database_name = database_name.replace(".","")
+
+    print(database_name)
+
+    if database.create_database(database_name, task[0]["server"], task[0]["oracle_home"], bookmark_name = bookmark_name):
+        print("Error with creating database from bookmark")
         sys.exit(-1)   
     else:
         print("Database refreshed")
+        sys.exit(0)
+
+
+if task[0]["action"] == "drop_vdb":
+    if user_database_name:
+        database_name = user_database_name
+    else:
+        if pipeline_build:
+            database_name = task[0]["database"] + f"_{pipeline_build}"
+        else:
+            database_name = task[0]["database"]
+    if database.delete_database(database_name, task[0]["server"]):
+        print("Error with dropping database")
+        sys.exit(-1)   
+    else:
+        print("Database dropped")
         sys.exit(0)
 
 #print(database.find_virtual_database('pipedb'))
