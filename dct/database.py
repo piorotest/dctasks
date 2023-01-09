@@ -114,7 +114,15 @@ def create_database(database_name:str, fqdn:str, repository:str, **kwargs):
         "name": database_name,
         "database_name": database_name,
         "environment_id": fqdn,
-        "repository_id": repository
+        "repository_id": repository,
+        "configure_clone": [
+            {
+            "name": "configure_clone_command",
+            "command": "sqlcmd -d $env:VDB_DATABASE_NAME -Q \"create user lb for login lb\"",
+            "shell": "psd"
+            }
+        ]
+        
     }
 
     if bookmark_name:
