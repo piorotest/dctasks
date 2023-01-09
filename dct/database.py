@@ -103,22 +103,41 @@ def refresh_vdb(database_name:str, fqdn:str=None, **kwargs):
 
 def create_database(database_name:str, fqdn:str, repository:str, **kwargs):
     # todo: implement other
+    
+    dbtype = kwargs.get('dbtype')
+    snapshot_id = kwargs.get('snapshot_id')
+    source = kwargs.get('source')
     bookmark_name = kwargs.get('bookmark_name')
 
     create_obj = {
-        "target_group_id": "Oracle 19c Virtual Databases",
+        "target_group_id": "Targets",
         "name": database_name,
         "database_name": database_name,
         "environment_id": fqdn,
-        "repository_id": repository,
-        "template_id": "vdbtemplate",
-        "online_log_size": 50,
-        "online_log_groups": 3,
-        "bookmark_id": bookmark_name
+        "repository_id": repository
     }
 
+    if bookmark_name:
+        create_obj = {
+            "bookmark_id": bookmark_name
+        }
+        url = f"vdbs/provision_from_bookmark"
 
-    url = f"vdbs/provision_from_bookmark"
+
+    if snapshot_id:
+        if snapshot_id == 'LATEST':
+            create_obj["source_data_id"] = source
+        else:
+            create_obj["snapshot_id"] = snapshot_id
+        url = f"vdbs/provision_by_snapshot"
+
+
+    if dbtype.lower() == 'oracle':
+        create_obj["template_id"] = "vdbtemplate"
+        create_obj["online_log_size"] = 50
+        create_obj["online_log_groups"] = 3
+
+    
     res = common.DCT_POST(url, payload=create_obj)
     if res:
         common.wait_for_job(res["job"]["id"])      
@@ -139,6 +158,26 @@ def delete_database(database_name:str, fqdn:str):
 
     url = f"vdbs/{dbid}/delete"
     res = common.DCT_POST(url, payload=delete_obj)
+    if res:
+        common.wait_for_job(res["job"]["id"])      
+    else:
+        return 1
+
+
+    return 0
+
+
+def disable_database(database_name:str, fqdn:str):
+
+    disable_obj = {
+        "attempt_cleanup": True
+    }
+
+    dbid = find_virtual_database(database_name)
+    print(f"DATABASE ID {dbid}")
+
+    url = f"vdbs/{dbid}/disable"
+    res = common.DCT_POST(url, payload=disable_obj)
     if res:
         common.wait_for_job(res["job"]["id"])      
     else:

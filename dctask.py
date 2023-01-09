@@ -18,7 +18,7 @@ print(f"Connecting to DCT: {common.BASE_URL}")
 if pipeline_build:
     print(f"adding pipeline suffix to bookmarks: {pipeline_build}")
 
-with open('dctasks.yml') as f:
+with open('/code/dctasks.yml') as f:
    task_list = yaml.load(f, Loader=SafeLoader)
 
 task = [ x for x in task_list if x["name"] == task_name ]
@@ -98,7 +98,7 @@ if task[0]["action"] == "create_vdb_from_bookmark":
         database_name = user_database_name
     else:
         if pipeline_build:
-            database_name = task[0]["database"] + f"_{pipeline_build}"[5:]
+            database_name = task[0]["database"] + f"_{pipeline_build}"
         else:
             database_name = task[0]["database"]
 
@@ -106,8 +106,31 @@ if task[0]["action"] == "create_vdb_from_bookmark":
 
     print(database_name)
 
-    if database.create_database(database_name, task[0]["server"], task[0]["oracle_home"], bookmark_name = bookmark_name):
+    if database.create_database(database_name, task[0]["server"], task[0]["repository"], bookmark_name = bookmark_name, dbtype = task[0]["dbtype"]):
         print("Error with creating database from bookmark")
+        sys.exit(-1)   
+    else:
+        print("Database refreshed")
+        sys.exit(0)
+
+
+if task[0]["action"] == "create_vdb_from_snapshot":
+
+    if user_database_name:
+        database_name = user_database_name
+    else:
+        if pipeline_build:
+            database_name = task[0]["database"] + f"_{pipeline_build}"
+        else:
+            database_name = task[0]["database"]
+
+    database_name = database_name.replace(".","")
+
+    print(database_name)
+
+    if database.create_database(database_name, task[0]["server"], task[0]["repository"], snapshot_id = task[0]["snapshot_id"], dbtype = task[0]["dbtype"],
+                                source = task[0]["source"]):
+        print("Error with creating database from snapshot")
         sys.exit(-1)   
     else:
         print("Database refreshed")
@@ -122,11 +145,35 @@ if task[0]["action"] == "drop_vdb":
             database_name = task[0]["database"] + f"_{pipeline_build}"
         else:
             database_name = task[0]["database"]
+
+    
+    database_name = database_name.replace(".","")
+
     if database.delete_database(database_name, task[0]["server"]):
         print("Error with dropping database")
         sys.exit(-1)   
     else:
         print("Database dropped")
+        sys.exit(0)
+
+
+if task[0]["action"] == "disable_vdb":
+    if user_database_name:
+        database_name = user_database_name
+    else:
+        if pipeline_build:
+            database_name = task[0]["database"] + f"_{pipeline_build}"
+        else:
+            database_name = task[0]["database"]
+
+    
+    database_name = database_name.replace(".","")
+
+    if database.disable_database(database_name, task[0]["server"]):
+        print("Error with disabling database")
+        sys.exit(-1)   
+    else:
+        print("Database disabled")
         sys.exit(0)
 
 #print(database.find_virtual_database('pipedb'))

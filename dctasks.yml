@@ -4,7 +4,7 @@
 
 - name: create bookmark
   action: create_bookmark 
-  source: devdb
+  source: pipedb
   bookmark_name: book1-devdb
 
 - name: refresh from bookmark 
@@ -18,11 +18,18 @@
 
 
 - name: create a pipeline database
-  action: create_vdb_from_bookmark
+  action: create_vdb_from_snapshot
   database: pipedb
-  bookmark_name: book1-devdb
-  server: singlenode
-  oracle_home: /u01/app/oracle/product/19.0.0/dbhome_1
+  snapshot_id: LATEST
+  server: single
+  source: test
+  repository: MSSQLSERVER
+  dbtype: mssql
+
+- name: disable database
+  action: disable_vdb
+  server: single
+  database: pipedb
 
 - name: delete database
   action: drop_vdb
