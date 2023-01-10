@@ -31,9 +31,14 @@ if len(task) != 1:
 if task[0]["action"] == "create_bookmark":
     if pipeline_build:
         bookmark_name = task[0]["bookmark_name"] + f"_{pipeline_build}"
+        database_name = task[0]["database"] + f"_{pipeline_build}"
     else:
         bookmark_name = task[0]["bookmark_name"]
-    if database.create_bookmark(task[0]["source"], bookmark_name):
+        database_name = task[0]["database"]
+
+    database_name = database_name.replace(".","")
+
+    if database.create_bookmark(database_name, bookmark_name):
         print("Error with creating bookmark")
         sys.exit(-1)
     else:

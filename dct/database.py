@@ -118,7 +118,7 @@ def create_database(database_name:str, fqdn:str, repository:str, **kwargs):
         "configure_clone": [
             {
             "name": "configure_clone_command",
-            "command": "sqlcmd -d $env:VDB_DATABASE_NAME -Q \"create user lb for login lb\"",
+            "command": "sqlcmd -d $env:VDB_DATABASE_NAME -Q \"CREATE USER lb FOR LOGIN lb WITH DEFAULT_SCHEMA=dbo; EXEC sp_addrolemember 'db_ddladmin', 'lb'; EXEC sp_addrolemember 'db_datareader', 'lb'; EXEC sp_addrolemember 'db_datawriter', 'lb';\"",
             "shell": "psd"
             }
         ]
