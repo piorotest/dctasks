@@ -126,9 +126,7 @@ def create_database(database_name:str, fqdn:str, repository:str, **kwargs):
     }
 
     if bookmark_name:
-        create_obj = {
-            "bookmark_id": bookmark_name
-        }
+        create_obj["bookmark_id"] = bookmark_name
         url = f"vdbs/provision_from_bookmark"
 
 

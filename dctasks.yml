@@ -40,7 +40,7 @@
 
 - name: list bookmark
   action: list_bookmark
-  database: devdb,pipedb
+  database: pipedb_202301102
 
   
 - name: create pre-test bookmark
@@ -56,7 +56,8 @@
 
 - name: create a fixdb database
   action: create_vdb_from_bookmark
-  database: f
+  database: fixdb
   bookmark_name: fixdb
-  server: singlenode
-  oracle_home: /u01/app/oracle/product/19.0.0/dbhome_1
+  server: single
+  repository: MSSQLSERVER
+  dbtype: mssql
